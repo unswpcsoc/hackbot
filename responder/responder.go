@@ -15,7 +15,10 @@ var responders = []Responder{
 func Notify(message string) []string {
 	responses := []string{}
 	for _, res := range responders {
-		responses = append(responses, res.OnMessage(message))
+		resp := res.OnMessage(message)
+		if resp != "" {
+			responses = append(responses, resp)
+		}
 	}
 	return responses
 }

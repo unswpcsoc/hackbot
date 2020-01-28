@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -20,18 +19,18 @@ var (
 func init() {
 	key, ok := os.LookupEnv("DISCORD")
 	if !ok {
-		errs.Fatalln("Missing Discord API Key: Set env var $DISCORD")
+		log.Fatalln("Missing Discord API Key: Set env var $DISCORD")
 	}
 
 	var err error
 	dgo, err = discordgo.New("Bot " + key)
 	if err != nil {
-		errs.Fatalln(err)
+		log.Fatalln(err)
 	}
 
 	err = dgo.Open()
 	if err != nil {
-		errs.Fatalln(err)
+		log.Fatalln(err)
 	}
 
 	dgo.SyncEvents = false
@@ -40,17 +39,17 @@ func init() {
 
 func main() {
 	defer dgo.Close()
-	defer commands.DBClose()
 
-	dgo.UpdateStatus(0, commands.Prefix+handlers.HelpAlias)
-
-	// init loggers
-	handlers.InitLogs(dgo)
+	dgo.UpdateStatus(0, "hacking...")
 
 	// handle responder commands
 	dgo.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		if m.Author.Bot {
+			return
+		}
+
 		responses := responder.Notify(m.Message.Content)
-		for res := range responses {
+		for _, res := range responses {
 			s.ChannelMessageSend(m.ChannelID, res)
 		}
 	})

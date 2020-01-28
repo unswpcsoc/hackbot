@@ -12,4 +12,5 @@ func (p *Ping) OnMessage(message string) string {
 	if strings.ToLower(message) == "|ping" {
 		return "|pong"
 	}
+	return ""
 }
